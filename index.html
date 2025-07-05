@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DesignCraft - AI-Powered Interior Design</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2C3E50;
+            --secondary: #E67E22;
+            --accent: #3498DB;
+            --light: #ECF0F1;
+            --dark: #34495E;
+            --success: #27AE60;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        nav {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--secondary);
+        }
+
+        .cta-button {
+            background: var(--secondary);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            text-decoration: none;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(230, 126, 34, 0.3);
+        }
+
+        /* Hero Section */
+        .hero {
+            margin-top: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 5rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23ffffff" fill-opacity="0.1" d="M0,96L48,112C96,128,192,160,288,165.3C384,171,480,149,576,133.3C672,117,768,107,864,128C960,149,1056,203,1152,208C1248,213,1344,171,1392,149.3L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') no-repeat bottom;
+            background-size: cover;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            animation: fadeInUp 1s ease;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            animation: fadeInUp 1s ease 0.2s;
+            animation-fill-mode: both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* AI Assistant */
+        .ai-assistant {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(52, 152, 219, 0.3);
+            transition: transform 0.3s;
+            z-index: 999;
+        }
+
+        .ai-assistant:hover {
+            transform: scale(1.1);
+        }
+
+        .ai-assistant::before {
+            content: '🤖';
+            font-size: 30px;
+        }
+
+        .ai-chat {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 350px;
+            height: 500px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            display: none;
+            flex-direction: column;
+            z-index: 998;
+        }
+
+        .ai-chat.active {
+            display: flex;
+        }
+
+        .ai-header {
+            background: var(--accent);
+            color: white;
+            padding: 1rem;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ai-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        .ai-input {
+            padding: 1rem;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .ai-input input {
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            outline: none;
+        }
+
+        .ai-input button {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 5rem 2rem;
+            background: var(--light);
+        }
+
+        .features-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .features h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: var(--primary);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        /* Design Gallery */
+        .gallery {
+            padding: 5rem 2rem;
+        }
+
+        .gallery h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: var(--primary);
+        }
+
+        .filter-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: white;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-btn.active,
+        .filter-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .designs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .design-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+
+        .design-card:hover {
+            transform: scale(1.05);
+        }
+
+        .design-image {
+            width: 100%;
+            height: 250px;
+            background: linear-gradient(45deg, #eee, #ddd);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .design-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+
+        .design-card:hover .design-image img {
+            transform: scale(1.1);
+        }
+
+        .design-image.placeholder::before {
+            content: '🏠';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4rem;
+            opacity: 0.3;
+        }
+
+        .image-upload-note {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .design-info {
+            padding: 1.5rem;
+        }
+
+        .design-info h3 {
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+
+        .design-price {
+            color: var(--secondary);
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .select-design-btn {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 1rem;
+            width: 100%;
+            transition: background 0.3s;
+        }
+
+        .select-design-btn:hover {
+            background: #229954;
+        }
+
+        /* Vendor Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .close-btn {
+            font-size: 2rem;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .vendor-info {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .vendor-avatar {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+        }
+
+        .vendor-rating {
+            color: gold;
+            margin: 0.5rem 0;
+        }
+
+        .booking-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .booking-form input,
+        .booking-form textarea {
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: inherit;
+        }
+
+        .confirm-booking-btn {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: background 0.3s;
+        }
+
+        .confirm-booking-btn:hover {
+            background: #229954;
+        }
+
+        /* How It Works */
+        .how-it-works {
+            padding: 5rem 2rem;
+            background: var(--light);
+        }
+
+        .steps {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .step {
+            text-align: center;
+            position: relative;
+        }
+
+        .step-number {
+            width: 60px;
+            height: 60px;
+            background: var(--secondary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 0 auto 1rem;
+        }
+
+        .step h3 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--primary);
+            color: white;
+            text-align: center;
+            padding: 3rem 2rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .social-links {
+            margin-top: 2rem;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .social-links a {
+            color: white;
+            font-size: 1.5rem;
+            transition: transform 0.3s;
+        }
+
+        .social-links a:hover {
+            transform: scale(1.2);
+        }
+
+        /* Auth Page Styles */
+        .auth-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            z-index: 3000;
+            overflow-y: auto;
+        }
+
+        .auth-overlay.active {
+            display: block;
+        }
+
+        .auth-container {
+            max-width: 400px;
+            margin: 50px auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            animation: slideDown 0.5s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .auth-header {
+            background: var(--primary);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .auth-header h2 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .auth-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 2rem;
+            cursor: pointer;
+            color: white;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+
+        .auth-close:hover {
+            opacity: 1;
+        }
+
+        .auth-tabs {
+            display: flex;
+            background: #f5f5f5;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            color: #666;
+        }
+
+        .auth-tab.active {
+            background: white;
+            color: var(--primary);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .auth-form {
+            padding: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .auth-submit {
+            width: 100%;
+            padding: 1rem;
+            background: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .auth-submit:hover {
+            background: #d35400;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(230, 126, 34, 0.3);
+        }
+
+        .auth-divider {
+            text-align: center;
+            margin: 2rem 0;
+            position: relative;
+        }
+
+        .auth-divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #e0e0e0;
+        }
+
+        .auth-divider span {
+            background: white;
+            padding: 0 1rem;
+            position: relative;
+            color: #666;
+        }
+
+        .social-auth {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .social-btn {
+            flex: 1;
+            padding: 0.8rem;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-weight: 600;
+        }
+
+        .social-btn:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #666;
+        }
+
+        .form-footer a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .form-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .success-message {
+            display: none;
+            background: var(--success);
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .ai-chat {
+                width: 90%;
+                right: 5%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Auth Overlay -->
+    <div class="auth-overlay" id="authOverlay">
+        <div class="auth-container">
+            <div class="auth-header">
+                <span class="auth-close" onclick="closeAuthPage()">×</span>
+                <h2>Welcome to DesignCraft</h2>
+                <p>Transform your space with expert designers</p>
+            </div>
+            
+            <div class="auth-tabs">
+                <div class="auth-tab active" onclick="switchTab('login')">Login</div>
+                <div class="auth-tab" onclick="switchTab('signup')">Sign Up</div>
+            </div>
+
+            <div class="success-message" id="successMessage">
+                Account created successfully! Redirecting...
+            </div>
+
+            <!-- Login Form -->
+            <form class="auth-form" id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" required placeholder="Enter your email">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" required placeholder="Enter your password">
+                </div>
+                <button type="submit" class="auth-submit">Login</button>
+                
+                <div class="auth-divider">
+                    <span>OR</span>
+                </div>
+                
+                <div class="social-auth">
+                    <button type="button" class="social-btn" onclick="socialLogin('google')">
+                        🔍 Google
+                    </button>
+                    <button type="button" class="social-btn" onclick="socialLogin('facebook')">
+                        📘 Facebook
+                    </button>
+                </div>
+                
+                <div class="form-footer">
+                    <p>Don't have an account? <a href="#" onclick="switchTab('signup')">Sign up</a></p>
+                    <p><a href="#">Forgot Password?</a></p>
+                </div>
+            </form>
+
+            <!-- Signup Form -->
+            <form class="auth-form" id="signupForm" style="display: none;" onsubmit="handleSignup(event)">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" required placeholder="Enter your name">
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" required placeholder="Enter your email">
+                </div>
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" required placeholder="Enter your phone number">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" required placeholder="Create a password">
+                </div>
+                <div class="form-group">
+                    <label>Confirm Password</label>
+                    <input type="password" required placeholder="Confirm your password">
+                </div>
+                <button type="submit" class="auth-submit">Create Account</button>
+                
+                <div class="auth-divider">
+                    <span>OR</span>
+                </div>
+                
+                <div class="social-auth">
+                    <button type="button" class="social-btn" onclick="socialLogin('google')">
+                        🔍 Google
+                    </button>
+                    <button type="button" class="social-btn" onclick="socialLogin('facebook')">
+                        📘 Facebook
+                    </button>
+                </div>
+                
+                <div class="form-footer">
+                    <p>Already have an account? <a href="#" onclick="switchTab('login')">Login</a></p>
+                    <p style="font-size: 0.9rem; margin-top: 1rem;">By signing up, you agree to our <a href="#">Terms</a> and <a href="#">Privacy Policy</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo">🏡 DesignCraft</div>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#designs">Designs</a></li>
+                <li><a href="#how-it-works">How It Works</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <a href="#" class="cta-button" onclick="showAuthPage()">Get Started</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h1>Transform Your Space with AI-Powered Design</h1>
+            <p>Browse designs, get AI recommendations, and connect with verified vendors - all from your home!</p>
+            <a href="#designs" class="cta-button" style="font-size: 1.2rem; padding: 1rem 2rem;" onclick="showAuthPage()">Explore Designs</a>
+        </div>
+    </section>
+
+    <!-- AI Assistant -->
+    <div class="ai-assistant" onclick="toggleAI()"></div>
+    <div class="ai-chat" id="aiChat">
+        <div class="ai-header">
+            <h3>Design Assistant</h3>
+            <span class="close-btn" onclick="toggleAI()">×</span>
+        </div>
+        <div class="ai-messages" id="aiMessages">
+            <div class="message">
+                <p><strong>AI:</strong> Hello! I'm your interior design assistant. Tell me about your space and I'll recommend the perfect design for you! 🏠</p>
+            </div>
+        </div>
+        <div class="ai-input">
+            <input type="text" id="aiInput" placeholder="Describe your room...">
+            <button onclick="sendAIMessage()">Send</button>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="features-container">
+            <h2>Why Choose DesignCraft?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🎨</div>
+                    <h3>Curated Designs</h3>
+                    <p>Browse through thousands of professionally curated interior designs for every style and budget.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h3>AI Recommendations</h3>
+                    <p>Our AI analyzes your space and preferences to suggest designs that perfectly match your needs.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">👷</div>
+                    <h3>Verified Vendors</h3>
+                    <p>Connect with trusted, verified vendors who will visit your home and bring your design to life.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Design Gallery -->
+    <section class="gallery" id="designs">
+        <h2>Explore Our Designs</h2>
+        <div class="filter-buttons">
+            <button class="filter-btn active" onclick="filterDesigns('all')">All</button>
+            <button class="filter-btn" onclick="filterDesigns('living')">Living Room</button>
+            <button class="filter-btn" onclick="filterDesigns('bedroom')">Bedroom</button>
+            <button class="filter-btn" onclick="filterDesigns('kitchen')">Kitchen</button>
+            <button class="filter-btn" onclick="filterDesigns('office')">Office</button>
+        </div>
+        <div class="designs-grid" id="designsGrid">
+            <!-- Design cards will be dynamically generated -->
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="features-container">
+            <h2>How It Works</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Browse Designs</h3>
+                    <p>Explore our vast collection of interior designs or let our AI suggest the perfect match.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Select & Customize</h3>
+                    <p>Choose your favorite design and customize it according to your space and preferences.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>Book a Vendor</h3>
+                    <p>We'll assign a verified vendor who will visit your home and execute the design perfectly.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h3>Enjoy Your Space</h3>
+                    <p>Sit back and watch as your dream interior comes to life with professional execution.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Vendor Modal -->
+    <div class="modal" id="vendorModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Book Your Vendor</h2>
+                <span class="close-btn" onclick="closeModal()">×</span>
+            </div>
+            <div class="vendor-info">
+                <div class="vendor-avatar">👨‍🔧</div>
+                <h3 id="vendorName">Rajesh Kumar</h3>
+                <p>Expert Interior Designer</p>
+                <div class="vendor-rating">⭐⭐⭐⭐⭐ 4.8/5</div>
+                <p>10+ years experience | 500+ projects completed</p>
+            </div>
+            <form class="booking-form" onsubmit="confirmBooking(event)">
+                <input type="text" placeholder="Your Name" required>
+                <input type="tel" placeholder="Phone Number" required>
+                <input type="email" placeholder="Email Address" required>
+                <textarea placeholder="Address" rows="3" required></textarea>
+                <input type="date" required>
+                <button type="submit" class="confirm-booking-btn">Confirm Booking</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer id="contact">
+        <div class="footer-content">
+            <h3>DesignCraft</h3>
+            <p>Transforming spaces, one design at a time.</p>
+            <p>📧 contact@designcraft.com | 📞 +91 72070707367</p>
+            <div class="social-links">
+                <a href="#">📘</a>
+                <a href="#">📷</a>
+                <a href="#">🐦</a>
+                <a href="#">💼</a>
+            </div>
+            <p style="margin-top: 2rem; opacity: 0.8;">© 2025 DesignCraft. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Design data with image paths
+        const designs = [
+            { 
+                id: 1, 
+                name: 'Modern Minimalist', 
+                category: 'living', 
+                price: '₹45,000', 
+                description: 'Clean lines and neutral colors',
+                image: 'modern.webp' // Save your image with this name
+            },
+            { 
+                id: 2, 
+                name: 'Cozy Scandinavian', 
+                category: 'bedroom', 
+                price: '₹38,000', 
+                description: 'Warm and inviting atmosphere',
+                image: 'cozy.webp'
+            },
+            { 
+                id: 3, 
+                name: 'Industrial Chic', 
+                category: 'living', 
+                price: '₹52,000', 
+                description: 'Raw materials and urban style',
+                image: 'ind.webp'
+            },
+            { 
+                id: 4, 
+                name: 'Classic Elegance', 
+                category: 'bedroom', 
+                price: '₹65,000', 
+                description: 'Timeless luxury and comfort',
+                image: 'class.webp'
+            },
+            { 
+                id: 5, 
+                name: 'Modern Kitchen', 
+                category: 'kitchen', 
+                price: '₹75,000', 
+                description: 'Sleek and functional design',
+                image: 'mod.webp'
+            },
+            { 
+                id: 6, 
+                name: 'Home Office Pro', 
+                category: 'office', 
+                price: '₹35,000', 
+                description: 'Productive and stylish workspace',
+                image: 'off.webp'
+            },
+            { 
+                id: 7, 
+                name: 'Bohemian Paradise', 
+                category: 'living', 
+                price: '₹42,000', 
+                description: 'Eclectic and colorful vibes',
+                image: 'boh.webp'
+            },
+            { 
+                id: 8, 
+                name: 'Luxury Master Suite', 
+                category: 'bedroom', 
+                price: '₹85,000', 
+                description: 'Ultimate comfort and style',
+                image: 'lux.webp'
+            },
+            { 
+                id: 9, 
+                name: 'Smart Kitchen', 
+                category: 'kitchen', 
+                price: '₹95,000', 
+                description: 'Technology meets design',
+                image: 'sma.webp'
+            },
+        ];
+
+        // Vendor names
+        const vendors = [
+            'Rajesh Kumar', 'Priya Sharma', 'Amit Patel', 'Sunita Reddy', 'Vikram Singh'
+        ];
+
+        // Auth functions
+        function showAuthPage() {
+            document.getElementById('authOverlay').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeAuthPage() {
+            document.getElementById('authOverlay').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        function switchTab(tab) {
+            const loginForm = document.getElementById('loginForm');
+            const signupForm = document.getElementById('signupForm');
+            const tabs = document.querySelectorAll('.auth-tab');
+            
+            tabs.forEach(t => t.classList.remove('active'));
+            
+            if (tab === 'login') {
+                loginForm.style.display = 'block';
+                signupForm.style.display = 'none';
+                tabs[0].classList.add('active');
+            } else {
+                loginForm.style.display = 'none';
+                signupForm.style.display = 'block';
+                tabs[1].classList.add('active');
+            }
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            // Simulate login
+            alert('Login successful! Welcome back to DesignCraft.');
+            closeAuthPage();
+        }
+
+        function handleSignup(event) {
+            event.preventDefault();
+            // Show success message
+            document.getElementById('successMessage').classList.add('show');
+            
+            // Simulate signup and redirect
+            setTimeout(() => {
+                document.getElementById('successMessage').classList.remove('show');
+                closeAuthPage();
+                alert('Welcome to DesignCraft! You can now browse and select designs.');
+            }, 2000);
+        }
+
+        function socialLogin(provider) {
+            alert(`${provider} login would be implemented here. For now, please use email signup.`);
+        }
+
+        // Initialize designs
+        function loadDesigns(category = 'all') {
+            const grid = document.getElementById('designsGrid');
+            grid.innerHTML = '';
+            
+            const filteredDesigns = category === 'all' 
+                ? designs 
+                : designs.filter(d => d.category === category);
+            
+            filteredDesigns.forEach(design => {
+                const card = document.createElement('div');
+                card.className = 'design-card';
+                card.innerHTML = `
+                    <div class="design-image ${!design.image ? 'placeholder' : ''}">
+                        ${design.image ? 
+                            `<img src="${design.image}" alt="${design.name}" onerror="this.parentElement.classList.add('placeholder'); this.style.display='none';">` : 
+                            ''
+                        }
+                        ${!design.image ? '<div class="image-upload-note">Save as: ' + design.image + '</div>' : ''}
+                    </div>
+                    <div class="design-info">
+                        <h3>${design.name}</h3>
+                        <p>${design.description}</p>
+                        <div class="design-price">${design.price}</div>
+                        <button class="select-design-btn" onclick="selectDesign('${design.name}')">
+                            Select This Design
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Filter designs
+        function filterDesigns(category) {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            loadDesigns(category);
+        }
+
+        // Select design
+        function selectDesign(designName) {
+            const randomVendor = vendors[Math.floor(Math.random() * vendors.length)];
+            document.getElementById('vendorName').textContent = randomVendor;
+            document.getElementById('vendorModal').classList.add('active');
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('vendorModal').classList.remove('active');
+        }
+
+        // Confirm booking
+        function confirmBooking(event) {
+            event.preventDefault();
+            alert('Booking confirmed! The vendor will contact you within 24 hours.');
+            closeModal();
+        }
+
+        // AI Chat functionality
+        function toggleAI() {
+            document.getElementById('aiChat').classList.toggle('active');
+        }
+
+        function sendAIMessage() {
+            const input = document.getElementById('aiInput');
+            const messages = document.getElementById('aiMessages');
+            
+            if (input.value.trim()) {
+                // Add user message
+                messages.innerHTML += `
+                    <div class="message">
+                        <p><strong>You:</strong> ${input.value}</p>
+                    </div>
+                `;
+                
+                // Simulate AI response
+                setTimeout(() => {
+                    const responses = [
+                        "Based on your description, I recommend our Modern Minimalist design for a clean, spacious feel!",
+                        "For your space, the Cozy Scandinavian style would create a warm and inviting atmosphere.",
+                        "Have you considered our Industrial Chic design? It's perfect for urban-style homes!",
+                        "I think the Classic Elegance design would suit your taste perfectly!",
+                        "Let me analyze your requirements... The Bohemian Paradise design might be just what you're looking for!"
+                    ];
+                    
+                    const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                    messages.innerHTML += `
+                        <div class="message">
+                            <p><strong>AI:</strong> ${randomResponse}</p>
+                        </div>
+                    `;
+                    messages.scrollTop = messages.scrollHeight;
+                }, 1000);
+                
+                input.value = '';
+                messages.scrollTop = messages.scrollHeight;
+            }
+        }
+
+        // Enter key support for AI chat
+        document.getElementById('aiInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendAIMessage();
+            }
+        });
+
+        // Load designs on page load
+        loadDesigns();
+
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
